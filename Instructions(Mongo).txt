@@ -1,0 +1,26 @@
+cd C:\Program Files\MongoDB\Server\3.6\bin
+
+>mongod.exe --dbpath d:\test\mongodb\data
+
+
+>mongod.exe --dbpath E:\Program Files\MongoDB\Server\3.6\bin\mongodb\data
+
+mongod.exe --dbpath "E:\Program Files\MongoDB\Server\3.6\bin\mongodb\test"
+
+
+
+Ctrl + Shift + Enter
+mkdir c:\data\db
+mkdir c:\data\log
+
+
+C:\Program Files\MongoDB\Server\3.6\mongod.cfg that specifies both systemLog.path and storage.dbPath:
+systemLog:
+    destination: file
+    path: c:\data\log\mongod.log
+storage:
+    dbPath: c:\data\db
+
+
+
+sc.exe create MongoDB binPath= "\"C:\Program Files\MongoDB\Server\3.6\bin\mongod.exe\" --service --config=\"C:\Program Files\MongoDB\Server\3.6\mongod.cfg\"" DisplayName= "MongoDB" start= "auto"

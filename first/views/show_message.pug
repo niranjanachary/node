@@ -1,0 +1,10 @@
+html
+   head
+      title User registration status
+   body
+      if(type == "error")
+         h3(style = "color:red") #{message}
+      else
+         h3 New user, 
+            password: #{user.password} and 
+            address: #{user.address} added!

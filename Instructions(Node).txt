@@ -1,0 +1,28 @@
+install node
+
+npm init
+npm install --save express
+npm install -g nodemon
+
+To run a project
+node index.js
+
+npm install --save body-parser multer
+
+npm install --save cookie-parser
+
+npm install --save pug
+
+npm install --save mongoose
+
+For Production:
+npm install --save compression
+npm install --save helmet
+
+sudo npm install -g pm2
+pm2 start hello.js
+pm2 stop app_name_or_id
+pm2 restart app_name_or_id
+pm2 list
+pm2 info example
+pm2 monit
