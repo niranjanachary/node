@@ -5,7 +5,8 @@ npm install --save express
 npm install -g nodemon
 
 To run a project
-node index.js
+node index.js //Normal run
+nodemon index.js //Auto refresh code
 
 npm install --save body-parser multer
 
@@ -14,6 +15,8 @@ npm install --save cookie-parser
 npm install --save pug
 
 npm install --save mongoose
+
+npm install recursive-readdir
 
 For Production:
 npm install --save compression

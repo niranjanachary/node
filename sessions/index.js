@@ -28,6 +28,41 @@ app.use(cookieSession({
  
 app.get('/', function (req, res, next) {
   // Update views
+
+const readline = require("readline");
+var cl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+
+// var question = function(q) {
+//     return new Promise( (res, rej) => {
+//         cl.question( q, answer => {
+//             res(answer);
+//         })
+//     });
+// };
+// (async function main() {
+//     var answer;
+//     while ( answer != 'yes' ) {
+//         answer = await question('Are you sure? ');
+//     }
+//     console.log( 'finally you are sure!');
+// })();
+
+// rl.question("What is your name ? ", function(name) {
+//     rl.question("Where do you live ? ", function(country) {
+//         console.log(`${name}, is a citizen of ${country}`);
+//         // rl.close();
+//     });
+// });
+
+// rl.on("close", function() {
+//     console.log("\nBYE BYE !!!");
+//     process.exit(0);
+// });
+
   req.session.views = (req.session.views || 0) + 1
  
   // Write response

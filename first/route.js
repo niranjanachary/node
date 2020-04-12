@@ -1,10 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function(req, res){
-	res.render('index');
-   // res.send('GET route on things.');
-});
+router.get('/', controllers.mycontroller.index);
 router.post('/', function(req, res){
    res.send('POST route on things.');
 });

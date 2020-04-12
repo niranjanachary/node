@@ -1,14 +1,22 @@
+"use strict";
 var express = require('express');
 var app = express();
-util = require('util');
+global.util = require('util');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var upload = multer();
+var glob = require('glob'),
+   path = require('path');
+var fs = require('fs');
+var recursive = require("recursive-readdir");
 
-var config = require('./config.js');
-// console.log(config);return;
 
-debug = require('debug')('http')
+var variables = require('./config.js');
+var config = variables[variables.environment];
+
+var http,name;
+
+global.debug = require('debug')('http')
   , http = require('http')
   , name = 'My App';
 
@@ -26,58 +34,45 @@ var cookieParser = require('cookie-parser');
 app.use(cookieParser())
 
 app.set('view engine', 'pug');
-app.set('views','./views');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static('public'));
 app.use('/static', express.static('public'));
 
+// Database from here
+global.mongoose = require('mongoose');
+mongoose.connect(config.database.engine+"://"+config.database.host+":"+config.database.port+"/"+config.database.database, { useNewUrlParser: true,useUnifiedTopology: true  });
+
+global.controllers = {};
+function walkDir(dir, callback) {
+   fs.readdirSync(dir).forEach( f => {
+     let dirPath = path.join(dir, f);
+     let isDirectory = fs.statSync(dirPath).isDirectory();
+     isDirectory ? 
+       walkDir(dirPath, callback) : callback(path.join(dir, f));
+   });
+ };
+ walkDir(path.join(__dirname, 'components'), function(filePath) {
+   require(filePath);
+ });
+   
 var routes = require('./route.js');
-
-
 var middleware = require('./middleware.js');
 app.use('/',middleware);
-
-// Database from here
-var mongoose = require('mongoose');
-mongoose.connect("mongodb://localhost:27017/nodejs", { useNewUrlParser: true });
-var usersSchema = mongoose.Schema({
-   name: String,
-   password: String,
-   address: String
-});
-Users = mongoose.model("Users", usersSchema);
-
 
 //both index.js and routes.js should be in same directory
 app.use('/', routes);
 
-var glob = require('glob'),
-	path = require('path');
-
-glob.sync('./routes/*.js').forEach(function(file) {
+glob.sync(path.join(__dirname, 'routes')+'/*.js').forEach(function(file) {
 	var route = require(path.resolve(file));
 	app.use('/', route);
 });
 
 
-   //    var newUsers = new Users({
-   //       name: 'Niranjan',
-   //       age: 30,
-   //       nationality: 'Indian2',
-   //       address: 'Motinagar',
-   //       phone: '9963606921'
-   //    });
-		
-   //    newPerson.save(function(err, Person){
-   //       if(err)
-   // console.log("Failed " + Date.now());
-   //       else
-   // console.log("Success " + Date.now());
-   //    });
 
 var server = app.listen(8080, function() {
 	var host = server.address().address
 	var port = server.address().port
 
-	console.log("Example app listening at http://%s:%s", host, port)
+	console.log("App listening at http://%s:%s", host, port)
 })
