@@ -9,6 +9,13 @@ var router ={
 				'port':'27017',
 				'database':'nodejs'
 			},
+			'redis':
+			{
+				'enable': 0,
+				'host':'localhost',
+				'port':'6379',
+				'ttl': 260
+			},
 		},
 
 	'prod':
@@ -19,6 +26,13 @@ var router ={
 				'host':'localhost',
 				'port':'27017',
 				'database':'nodejs'
+			},
+			'redis':
+			{
+				'enable': 0,
+				'host':'localhost',
+				'port':'27017',
+				'ttl': 260
 			},
 		},
 };
