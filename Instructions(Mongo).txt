@@ -22,5 +22,26 @@ storage:
     dbPath: c:\data\db
 
 
+SC DELETE MongoDB
+sc.exe create MongoDB binPath= "\"C:\Program Files\MongoDB\Server\3.6\bin\mongod.exe\" --service --config=\"C:\Program Files\MongoDB\Server\3.6\bin\mongod.cfg\" DisplayName= "MongoDB" start= "auto"
 
-sc.exe create MongoDB binPath= "\"C:\Program Files\MongoDB\Server\3.6\bin\mongod.exe\" --service --config=\"C:\Program Files\MongoDB\Server\3.6\mongod.cfg\"" DisplayName= "MongoDB" start= "auto"
+
+db.createUser(
+  {
+    user: "root",
+    pwd: "niranjan",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
+  }
+)
+
+db.createUser(
+  {
+    user: "node",
+    pwd: "niranjan",
+    roles: [ { role: "readWrite", db: "nodejs" }, "readWrite" ]
+  }
+)
+
+switched to db admin
+> db.shutdownServer();
+mongod --auth --port 27017 --dbpath "C:\Program Files\MongoDB\Server\4.0\data"

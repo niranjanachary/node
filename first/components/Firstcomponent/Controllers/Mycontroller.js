@@ -1,5 +1,17 @@
-var mycontroller = {};
-mycontroller.index = function(req,res) {
-    res.render('index');
+var Mycontroller = {};
+Mycontroller.index = function(req,res) {
+    console.log(req.session);
+
+    if(req.session.key) {
+        // if email key is sent redirect.
+        res.end(req.session.key);
+        // res.redirect('/admin');
+    } else {
+        // else go to home page.
+        res.render('index');
+    }
+
+    // res.render('index');
 };
-global.controllers['mycontroller'] = mycontroller;
+module.exports = Mycontroller;
+// global.controllers['mycontroller'] = mycontroller;

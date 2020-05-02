@@ -1,0 +1,13 @@
+yum install redis-server in ubuntu(for windows)
+
+>redis-server
+
+
+
+>redis-cli
+
+127.0.0.1:6379>CONFIG SET requirepass "seken123"
+127.0.0.1:6379>AUTH your-password
+127.0.0.1:6379>flushdb
+>flushall
+>save

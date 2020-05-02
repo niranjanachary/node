@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', controllers.mycontroller.index);
+router.get('/', controllers.Mycontroller.index);
+
+// router.get('/second', SecondController.myFunction);
+
 router.post('/', function(req, res){
    res.send('POST route on things.');
 });

@@ -9,17 +9,25 @@ var app = express();
 app.set('views', __dirname + '/views');
 app.engine('html', require('ejs').renderFile);
 
-app.use(session({
-    secret: 'ssshhhhh',
-    // create new redis store.
-    store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl :  260}),
-    saveUninitialized: false,
-    resave: false
-}));
+// app.use(session({
+//     secret: 'ssshhhhh',
+//     // create new redis store.
+//     store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl :  260,pass:'seken123',db:0}),
+//     saveUninitialized: false,
+//     resave: false
+// }));
+// app.set('trust proxy', 1) // trust first proxy
+// app.use(session({
+//   secret: 'keyboard cat',
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: { secure: true }
+// }));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.get('/',function(req,res){  
+app.get('/',function(req,res){
     // create new session object.
     if(req.session.key) {
         // if email key is sent redirect.

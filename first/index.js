@@ -9,16 +9,20 @@ var express = require('express'),
   upload = multer(),
   glob = require('glob'),
   path = require('path'),
-  fs = require('fs');
- global.util = require('util');
+  fs = require('fs'),
+  cookieParser = require('cookie-parser'),
+  variables = require('./config.js');
+  global.util = require('util');
+  global.bcrypt = require('bcrypt');
+  global.mongoose = require('mongoose');
+
 
 //Load configurations
-var variables = require('./config.js');
 var config = variables[variables.environment];
 
 // Database from here
-global.mongoose = require('mongoose');
-mongoose.connect(config.database.engine+"://"+config.database.host+":"+config.database.port+"/"+config.database.database, { useNewUrlParser: true,useUnifiedTopology: true  });
+var dbconnect = config.database.engine+"://"+config.database.username+":"+config.database.password+"@"+config.database.host+":"+config.database.port+"/"+config.database.database;
+mongoose.connect(dbconnect, { useNewUrlParser: true,useUnifiedTopology: true  });
 
 //Debugging
 var http,name;
@@ -31,13 +35,22 @@ global.debug = require('debug')('http')
 if(config.redis.enable == 1){
   var session_client  = redis.createClient();
   app.use(session({
-        secret: 'secrtkey',
+        secret: config.secret,
         // create new redis store.
-        store: new redisStore({ host: config.redis.host, port: config.redis.port, client: session_client,ttl :  config.redis.ttl}),
+        store: new redisStore({ host: config.redis.host, port: config.redis.port, client: session_client,ttl :  config.redis.ttl, pass:  config.redis.pass,db:  config.redis.db}),
         saveUninitialized: false,
         resave: false
       }));
+} else {
+  app.set('trust proxy', config.session.proxy) // trust first proxy
+  app.use(session({
+    secret: config.secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: config.session.secure,maxAge: config.session.age }
+  }));
 }
+
 
 
 //To parse json data
@@ -48,12 +61,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // for parsing multipart/form-data
 app.use(upload.array());
 
-var cookieParser = require('cookie-parser');
+//Cookie
 app.use(cookieParser())
 
-app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
+//Template engine
+if(config.template == 'pug'){
+  app.set('view engine', 'pug');
+  app.set('views', path.join(__dirname, 'views'));
+}
 
+if(config.template == 'html'){
+  app.set('view engine', 'html');
+  app.set('views', __dirname + '/views');
+  app.engine('html', require('ejs').renderFile);
+}
+
+
+//Public folder
 app.use(express.static('public'));
 app.use('/static', express.static('public'));
 
@@ -68,21 +92,37 @@ function walkDir(dir, callback) {
    });
  };
  walkDir(path.join(__dirname, 'components'), function(filePath) {
-   require(filePath);
+    // global.controllers['mycontroller'] = require(filePath);
+  var split = filePath.split('\\');
+  var variable = (split[split.length-1]).replace('.js','');
+  if(filePath.search('\\Controllers') >= 0){
+    global.controllers[variable] = require(filePath);
+  } else if (filePath.search('\\Models') >= 0){
+    var ModelSchema = require(filePath);
+    global[variable] = mongoose.model("Users", ModelSchema);
+  } else{
+    global[variable] = require(filePath);
+  }
  });
-
-//Load main routes
-var routes = require('./route.js');
-var middleware = require('./middleware.js');
-app.use('/',middleware);
-
 //both index.js and routes.js should be in same directory
+//Load main routes Must be here
+var routes = require('./route.js'),
+    middleware = require('./middleware.js');
+app.use('/',middleware);
 app.use('/', routes);
 
 //Load all routes
 glob.sync(path.join(__dirname, 'routes')+'/*.js').forEach(function(file) {
 	var route = require(path.resolve(file));
 	app.use('/', route);
+});
+
+app.post('/log',function(req,res){
+  // when user login set the key to redis.
+  req.session.key=req.body.email;
+  console.log(req.session.key);
+  res.end(req.body.email);return;
+  res.redirect('/');
 });
 
 

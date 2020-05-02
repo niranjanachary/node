@@ -19,14 +19,14 @@ router.get('/register', function(req, res){
 router.post('/register', function(req, res){
 
       var newUsers = new Users({
-         name: req.body.name,
+         username: req.body.name,
          password: req.body.password,
          address: req.body.address,
       });
-		
+      newUsers.password = bcrypt.hashSync(req.body.password, 10);
       newUsers.save(function(err, Person){
         if(err)
-            res.render('show_message', {message: "Database error", type: "error"});
+            res.render('show_message', {message: err, type: "error"});
          else
             res.render('show_message', {
                message: "New user added", type: "success", user: req.body});
