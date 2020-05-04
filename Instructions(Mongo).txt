@@ -5,7 +5,7 @@ cd C:\Program Files\MongoDB\Server\3.6\bin
 
 >mongod.exe --dbpath E:\Program Files\MongoDB\Server\3.6\bin\mongodb\data
 
-mongod.exe --dbpath "E:\Program Files\MongoDB\Server\3.6\bin\mongodb\test"
+C:/"\Program Files/"\MongoDB\Server\3.6\bin\mongod.exe --dbpath "E:\Program Files\MongoDB\Server\3.6\bin\mongodb\test"
 
 
 

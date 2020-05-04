@@ -32,10 +32,13 @@ router.post('/register', function(req, res){
                message: "New user added", type: "success", user: req.body});
       });
 });
-router.get('/users', function(req, res){
-   Users.find(function(err, response){
+router.get('/users', async function(req, res){
+   var firstclass = new FirstClass('Niranjan');
+   var response = await firstclass.print();
+console.log(response);
+   // Users.find(function(err, response){
       res.json(response);
-   });
+   // });
 });
 
 //export this router to use in our index.js

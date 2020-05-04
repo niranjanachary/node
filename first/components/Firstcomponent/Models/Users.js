@@ -22,7 +22,13 @@ var UserSchema = new mongoose.Schema({
     }
   });
   UserSchema.methods.comparePassword = function(password) {
-    return bcrypt.compareSync(password, this.hash_password);
+    return bcrypt.compareSync(password, this.password);
+};
+UserSchema.methods.getTableName = function() {
+  return 'Users';
+};
+UserSchema.methods.getTableClass = function() {
+  return 'Users';
 };
 module.exports = UserSchema;
  

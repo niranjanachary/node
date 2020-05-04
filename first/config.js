@@ -3,7 +3,7 @@ var router ={
 	'dev':
 		{
 			'secret':'changeitforprod',
-			'template':'html',
+			'template':'pug',
 			'database':
 			{
 				'engine':'mongodb',
@@ -18,7 +18,7 @@ var router ={
 				'enable': 0,
 				'host':'localhost',
 				'port':'6379',
-				'pass':'seken123',
+				'pass':'seken1234',
 				'db':0,
 				'ttl': 260
 			},

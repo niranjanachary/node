@@ -3,6 +3,7 @@ var router = express.Router();
 
 router.get('/', controllers.Mycontroller.index);
 
+router.post('/signin', controllers.Mycontroller.signin);
 // router.get('/second', SecondController.myFunction);
 
 router.post('/', function(req, res){

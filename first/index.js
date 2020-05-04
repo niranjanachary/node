@@ -14,15 +14,15 @@ var express = require('express'),
   variables = require('./config.js');
   global.util = require('util');
   global.bcrypt = require('bcrypt');
-  global.mongoose = require('mongoose');
 
 
 //Load configurations
 var config = variables[variables.environment];
 
 // Database from here
+global.mongoose = require('mongoose');
 var dbconnect = config.database.engine+"://"+config.database.username+":"+config.database.password+"@"+config.database.host+":"+config.database.port+"/"+config.database.database;
-mongoose.connect(dbconnect, { useNewUrlParser: true,useUnifiedTopology: true  });
+mongoose.connect(dbconnect, { useNewUrlParser: true,useUnifiedTopology: true,useCreateIndex: true });
 
 //Debugging
 var http,name;
@@ -33,7 +33,7 @@ global.debug = require('debug')('http')
 
 //Session server
 if(config.redis.enable == 1){
-  var session_client  = redis.createClient();
+  var session_client  = redis.createClient(config.redis.port, config.redis.host, { auth_pass: config.redis.pass });
   app.use(session({
         secret: config.secret,
         // create new redis store.
@@ -99,9 +99,30 @@ function walkDir(dir, callback) {
     global.controllers[variable] = require(filePath);
   } else if (filePath.search('\\Models') >= 0){
     var ModelSchema = require(filePath);
-    global[variable] = mongoose.model("Users", ModelSchema);
+    if(ModelSchema.methods.getTableName){
+      var tableName = ModelSchema.methods.getTableName();
+    } else {
+      var tableName = variable;
+    }
+    if(ModelSchema.methods.getTableClass){
+      var tableClass = ModelSchema.methods.getTableClass();
+    } else {
+      var tableClass = variable;
+    }
+    global[tableClass] = mongoose.model(tableName, ModelSchema);
   } else{
-    global[variable] = require(filePath);
+    if(!global[variable]){
+      global[variable] = require(filePath);
+    } else {
+      var component = filePath.split('\\components');
+      component = component[1].split('\\');
+      if(global[component[1]]){
+        global[component[1]][variable] = require(filePath);
+      } else {
+        global[component[1]] = [];
+        global[component[1]][variable] = require(filePath);
+      }
+    }
   }
  });
 //both index.js and routes.js should be in same directory
@@ -116,7 +137,6 @@ glob.sync(path.join(__dirname, 'routes')+'/*.js').forEach(function(file) {
 	var route = require(path.resolve(file));
 	app.use('/', route);
 });
-
 app.post('/log',function(req,res){
   // when user login set the key to redis.
   req.session.key=req.body.email;
