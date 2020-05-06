@@ -7,11 +7,13 @@ var router ={
 			'database':
 			{
 				'engine':'mongodb',
-				'host':'localhost',
 				'port':'27017',
+				// 'engine':'mysql',
+				// 'port':'3306',
+				'host':'localhost',
 				'database':'nodejs',
 				'username':'node',
-				'password':'niranjan'
+				'password':'niranjan',
 			},
 			'redis':
 			{

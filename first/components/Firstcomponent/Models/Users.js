@@ -1,5 +1,5 @@
 'use strict';
-var UserSchema = new mongoose.Schema({
+var UserSchema = new dbconnection.Schema({
     fullname : {
       type : String,
       trim : true,
@@ -24,9 +24,9 @@ var UserSchema = new mongoose.Schema({
   UserSchema.methods.comparePassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
-UserSchema.methods.getTableName = function() {
-  return 'Users';
-};
+  UserSchema.methods.getTableName = function() {
+    return 'Users';
+  };
 UserSchema.methods.getTableClass = function() {
   return 'Users';
 };

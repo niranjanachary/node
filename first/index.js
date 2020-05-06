@@ -20,9 +20,38 @@ var express = require('express'),
 var config = variables[variables.environment];
 
 // Database from here
-global.mongoose = require('mongoose');
-var dbconnect = config.database.engine+"://"+config.database.username+":"+config.database.password+"@"+config.database.host+":"+config.database.port+"/"+config.database.database;
-mongoose.connect(dbconnect, { useNewUrlParser: true,useUnifiedTopology: true,useCreateIndex: true });
+switch(config.database.engine){
+  case 'mongodb':
+    global.dbconnection = require('mongoose');
+    var dbconnect = config.database.engine+"://"+config.database.username+":"+config.database.password+"@"+config.database.host+":"+config.database.port+"/"+config.database.database;
+    dbconnection.connect(dbconnect, { useNewUrlParser: true,useUnifiedTopology: true,useCreateIndex: true });
+  break;
+  case 'mysql':
+    const mysql = require('mysql');
+    global.connection = mysql.createConnection({
+      host: config.database.host,
+      user: config.database.username,
+      password: config.database.password,
+      database: config.database.database
+    });
+    connection.connect((err) => {
+      if (err) throw err;
+      console.log('Connected!');
+    });
+    global.dbconnection = require('./core/mysql.js');
+    // var UserSchema = new dbconnection.Schema({
+    //   fullname : {
+    //     type : String,
+    //     trim : true,
+    //     required : false
+    //   }});
+    //   UserSchema.methods.getTableName = function() {
+    //     return 'Users';
+    //   };
+    // var Model = dbconnection.model('Users',UserSchema);
+    // console.log(Model.find());
+  break;
+}
 
 //Debugging
 var http,name;
@@ -109,7 +138,7 @@ function walkDir(dir, callback) {
     } else {
       var tableClass = variable;
     }
-    global[tableClass] = mongoose.model(tableName, ModelSchema);
+    global[tableClass] = dbconnection.model(tableName, ModelSchema);
   } else{
     if(!global[variable]){
       global[variable] = require(filePath);

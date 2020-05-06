@@ -19,23 +19,29 @@ router.get('/register', function(req, res){
 router.post('/register', function(req, res){
 
       var newUsers = new Users({
-         username: req.body.name,
+         username: req.body.username,
          password: req.body.password,
          address: req.body.address,
       });
       newUsers.password = bcrypt.hashSync(req.body.password, 10);
       newUsers.save(function(err, Person){
-        if(err)
-            res.render('show_message', {message: err, type: "error"});
-         else
-            res.render('show_message', {
-               message: "New user added", type: "success", user: req.body});
+        if(err){
+           res.json({"status":false,"message":"Error in creating user."})
+            // res.render('show_message', {message: err, type: "error"});
+        }else{
+         res.json({"status":true,"message":"New user added."})
+         // res.render('show_message', {
+         //       message: "New user added", type: "success", user: req.body});
+         }
       });
 });
 router.get('/users', async function(req, res){
    var firstclass = new FirstClass('Niranjan');
    var response = await firstclass.print();
-console.log(response);
+   for(var index in response){
+      console.log(response[index]);
+   }
+   // var func = response[8].comparePassword('niranjan');
    // Users.find(function(err, response){
       res.json(response);
    // });
