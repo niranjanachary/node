@@ -26,7 +26,7 @@ router.post('/register', function(req, res){
       newUsers.password = bcrypt.hashSync(req.body.password, 10);
       newUsers.save(function(err, Person){
         if(err){
-           res.json({"status":false,"message":"Error in creating user."})
+           res.json({"status":false,"message":err})
             // res.render('show_message', {message: err, type: "error"});
         }else{
          res.json({"status":true,"message":"New user added."})

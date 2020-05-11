@@ -6,10 +6,10 @@ var router ={
 			'template':'pug',
 			'database':
 			{
-				'engine':'mongodb',
-				'port':'27017',
-				// 'engine':'mysql',
-				// 'port':'3306',
+				// 'engine':'mongodb',
+				// 'port':'27017',
+				'engine':'mysql',
+				'port':'3306',
 				'host':'localhost',
 				'database':'nodejs',
 				'username':'node',
