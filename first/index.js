@@ -12,12 +12,16 @@ var express = require('express'),
   fs = require('fs'),
   cookieParser = require('cookie-parser'),
   variables = require('./config.js');
+  
+  global.i18n = require("i18n");
   global.util = require('util');
   global.bcrypt = require('bcrypt');
 
+  var slash = require('slash');
+
 
 //Load configurations
-var config = variables[variables.environment];
+global.config = variables[variables.environment];
 
 // Database from here
 switch(config.database.engine){
@@ -93,6 +97,9 @@ app.use(upload.array());
 //Cookie
 app.use(cookieParser())
 
+//Public folder
+app.use('/public', express.static(path.join(__dirname, 'assets')));
+
 //Template engine
 if(config.template == 'pug'){
   app.set('view engine', 'pug');
@@ -100,15 +107,13 @@ if(config.template == 'pug'){
 }
 
 if(config.template == 'html'){
-  app.set('view engine', 'html');
+  // app.set('view engine', 'html');
+  app.set("view engine", "ejs");
   app.set('views', __dirname + '/views');
-  app.engine('html', require('ejs').renderFile);
+  app.engine('ejs', require('ejs').renderFile);
 }
 
 
-//Public folder
-app.use(express.static('public'));
-app.use('/static', express.static('public'));
 
 //Load all controllers
 global.controllers = {};
@@ -121,12 +126,21 @@ function walkDir(dir, callback) {
    });
  };
  walkDir(path.join(__dirname, 'components'), function(filePath) {
-    // global.controllers['mycontroller'] = require(filePath);
-  var split = filePath.split('\\');
+  if (process.platform === 'win32') filePath = slash(filePath);
+  var split = filePath.split('/');
   var variable = (split[split.length-1]).replace('.js','');
-  if(filePath.search('\\Controllers') >= 0){
-    global.controllers[variable] = require(filePath);
-  } else if (filePath.search('\\Models') >= 0){
+  if(filePath.search('/Controllers') >= 0){
+    if(filePath == 'c:/nodejs/gitnode/node/first/components/Firstcomponent/Controllers/SecondController.js'){
+      var ControllerClass = require(filePath);
+      var ControllerObj = null;
+      eval(`
+        ControllerObj = new ${ControllerClass}();
+    `);
+      global.controllers[variable] = ControllerObj;
+    } else {
+      global.controllers[variable] = require(filePath);
+    }
+  } else if (filePath.search('/Models') >= 0){
     var ModelSchema = require(filePath);
     if(ModelSchema.methods.getTableName){
       var tableName = ModelSchema.methods.getTableName();
@@ -143,8 +157,8 @@ function walkDir(dir, callback) {
     if(!global[variable]){
       global[variable] = require(filePath);
     } else {
-      var component = filePath.split('\\components');
-      component = component[1].split('\\');
+      var component = filePath.split('/components');
+      component = component[1].split('/');
       if(global[component[1]]){
         global[component[1]][variable] = require(filePath);
       } else {
@@ -154,17 +168,44 @@ function walkDir(dir, callback) {
     }
   }
  });
-//both index.js and routes.js should be in same directory
-//Load main routes Must be here
-var routes = require('./route.js'),
+
+// glob.sync(path.join(__dirname, 'assets/js')+'/*.js').forEach(function(file) {
+//   require(path.resolve(file));
+// });
+
+ //both index.js and routes.js should be in same directory
+//Load main routes Must be here    
+
+i18n.configure({
+  locales:['en', 'ar'],
+  directory: __dirname + '/locales',
+  register: global,
+  });
+  app.use(i18n.init);
+
+  global.social_provider = null;
+  var routes = require('./route.js'),
     middleware = require('./middleware.js');
-app.use('/',middleware);
+
+    global.passport = require('passport');
+    app.use('/',middleware);
+    
+        // // require('./core/translation.js');
+        // var ExpressTranslate = require('express-translate');
+        // var options = {lng: 'en'};
+        // options.localeKey = 'en';
+        
+        // var expressTranslate = new ExpressTranslate();
+        // expressTranslate.addLanguage('en', { hello : 'Hello ${name1}' });
+        // app.use(expressTranslate.middleware());
+    
+
 app.use('/', routes);
 
 //Load all routes
 glob.sync(path.join(__dirname, 'routes')+'/*.js').forEach(function(file) {
 	var route = require(path.resolve(file));
-	app.use('/', route);
+	app.use('/:lng/', route);
 });
 app.post('/log',function(req,res){
   // when user login set the key to redis.

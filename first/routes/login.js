@@ -2,9 +2,7 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function(req, res) {
-	res.send('Hello World login');
-})
+router.get('/', controllers.Mycontroller.index);
 
 
 router.get('/login', function(req, res){
@@ -13,8 +11,13 @@ router.get('/login', function(req, res){
 router.post('/login', function(req, res){
    res.send('POST route on things.');
 });
-router.get('/register', function(req, res){
-   res.render('register');
+router.post('/user/login', controllers.Corecontroller.signin);
+router.post('/user/logout', controllers.Corecontroller.signout);
+router.post('/user/token', controllers.Corecontroller.token);
+router.get('/user/register', function(req, res){
+   console.log(req.session);
+   var data = {};
+   res.render('auth/register',data);
 });
 router.post('/register', function(req, res){
 
@@ -35,16 +38,19 @@ router.post('/register', function(req, res){
          }
       });
 });
-router.get('/users', async function(req, res){
+router.get('/hybridauth/:provider', controllers.Corecontroller.social);
+router.get('/hybridauth/return/:provider', passport.authenticate('facebook', { failureRedirect: '/' }),
+(req, res, next) => {
+  res.redirect('/');
+});
+
+router.post('/dashboard/index', controllers.Mycontroller.dashboard);
+router.get('/admin/users', async function(req, res){
    var firstclass = new FirstClass('Niranjan');
-   var response = await firstclass.print();
-   for(var index in response){
-      console.log(response[index]);
-   }
-   // var func = response[8].comparePassword('niranjan');
-   // Users.find(function(err, response){
-      res.json(response);
-   // });
+   var data = [];
+   data.users = await firstclass.print();
+   // res.json(response);
+   res.render('auth/users',data);
 });
 
 //export this router to use in our index.js

@@ -4,7 +4,11 @@ class SecondController {
       this.height = height;
       this.width = width;
     }
-    myFunction(req,res){
-        res.render('index');
+    async myFunction(req,res){
+      var firstclass = new FirstClass('Niranjan');
+      var data = [];
+      data.users = await firstclass.print();
+      res.render('auth/users',data);
     }
 }
+module.exports = SecondController;

@@ -3,7 +3,8 @@ var router ={
 	'dev':
 		{
 			'secret':'changeitforprod',
-			'template':'pug',
+			'template':'html',
+			'asset' : 'dev',
 			'database':
 			{
 				// 'engine':'mongodb',
@@ -20,7 +21,7 @@ var router ={
 				'enable': 0,
 				'host':'localhost',
 				'port':'6379',
-				'pass':'seken1234',
+				'pass':'',
 				'db':0,
 				'ttl': 260
 			},
@@ -29,6 +30,15 @@ var router ={
 				'proxy': 1,
 				'secure': false,
 				'age': null
+			},
+			'social':
+			{
+				'facebook':
+				{
+					FACEBOOK_CLIENT_ID:'642162635861191',
+					FACEBOOK_CLIENT_SECRET:'9dce195ed097f2663b10fb1a16cdcefc',
+					SESS_SECRET:'fdasfa'
+				}
 			}
 		},
 
@@ -36,6 +46,7 @@ var router ={
 		{
 			'secret':'changeitforprod',
 			'template':'html',
+			'asset' : 'prod',
 			'database':
 			{
 				'engine':'mongodb',
