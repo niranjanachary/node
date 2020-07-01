@@ -15,7 +15,6 @@ router.post('/user/login', controllers.Corecontroller.signin);
 router.post('/user/logout', controllers.Corecontroller.signout);
 router.post('/user/token', controllers.Corecontroller.token);
 router.get('/user/register', function(req, res){
-   console.log(req.session);
    var data = {};
    res.render('auth/register',data);
 });
@@ -39,7 +38,7 @@ router.post('/register', function(req, res){
       });
 });
 router.get('/hybridauth/:provider', controllers.Corecontroller.social);
-router.get('/hybridauth/return/:provider', passport.authenticate('facebook', { failureRedirect: '/' }),
+router.get('/hybridauth/return/:provider', passport.authenticate(social_provider, { failureRedirect: '/' }),
 (req, res, next) => {
   res.redirect('/');
 });

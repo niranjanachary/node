@@ -130,16 +130,16 @@ function walkDir(dir, callback) {
   var split = filePath.split('/');
   var variable = (split[split.length-1]).replace('.js','');
   if(filePath.search('/Controllers') >= 0){
-    if(filePath == 'c:/nodejs/gitnode/node/first/components/Firstcomponent/Controllers/SecondController.js'){
+    // if(filePath == 'e:/nodejs/projects/gitnode/first/components/Firstcomponent/Controllers/SecondController.js'){
       var ControllerClass = require(filePath);
       var ControllerObj = null;
       eval(`
         ControllerObj = new ${ControllerClass}();
     `);
       global.controllers[variable] = ControllerObj;
-    } else {
-      global.controllers[variable] = require(filePath);
-    }
+    // } else {
+    //   global.controllers[variable] = require(filePath);
+    // }
   } else if (filePath.search('/Models') >= 0){
     var ModelSchema = require(filePath);
     if(ModelSchema.methods.getTableName){

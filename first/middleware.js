@@ -29,9 +29,9 @@ app.use('/:lng/hybridauth', function(req, res, next) {
 	}
 	if(social_provider == 'facebook'){
 		require('./core/passport/facebook-strategy');   
-		app.use(passport.initialize());
-		app.use(passport.session());
 	}
+	app.use(passport.initialize());
+	app.use(passport.session());
 	// console.log(social_provider);
 	next();
 });
